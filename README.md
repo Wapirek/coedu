@@ -2,4 +2,4 @@
 
 ## Stack
 - Spring <:17
-- Vue
+- Angular
