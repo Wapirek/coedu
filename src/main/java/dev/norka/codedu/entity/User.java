@@ -26,8 +26,6 @@ public class User {
         this.updatedAt = new Date();
     }
 
-    // Getter and Setter methods
-
     public UUID getId() {
         return id;
     }
@@ -48,7 +46,6 @@ public class User {
         return password;
     }
 
-    // Automatically encode the password before saving
     public void setPassword(String password) {
         this.password = passwordEncoder.encode(password);
     }
