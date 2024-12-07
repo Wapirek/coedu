@@ -66,6 +66,21 @@ public class FileController {
         }
     }
 
+    @DeleteMapping ("/download/{fileName}")
+    public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get(uploadDir + fileName);
+            if(Files.deleteIfExists(filePath)){
+                return ResponseEntity.ok("successful");
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
 
     @GetMapping("/files")
     public ResponseEntity<Set<String>> getFiles(){
