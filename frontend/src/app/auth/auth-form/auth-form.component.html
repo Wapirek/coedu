@@ -1,19 +1,40 @@
+<div class="backdrop"></div>
+
 <div class="wrapper">
 
-    <h2 class="wrapper__title">{{title}}</h2>
+	<h2 class="wrapper__title">{{title}}</h2>
 
-    <form class="auth">
+	<form class="auth" [formGroup]="fieldsForm" (ngSubmit)="submitEvt.emit(fieldsForm.value)">
 
-        <div class="auth__row">
+		@for (field of fields; track field.id) {
+			<div class="auth__item">
 
-            <div class="auth__row__item">
+				<label [for]="field.id" class="auth__item__label">
+					{{field.label}}
+				</label>
 
-                <label for="" class="auth__row__item__label"></label>
+				<input
+						class="auth__item__input"
+						[id]="field.id"
+						[required]="field.required"
+						[placeholder]="field.placeholder"
+						[type]="field.type"
+						[formControlName]="field.id"
+				>
 
-            </div>
+			</div>
+		}
 
-        </div>
+		<div class="auth__btn-field">
 
-    </form>
+			<button
+					class="auth__btn-field__submit"
+					type="submit"
+					[disabled]="fieldsForm.invalid"
+			>{{btnTxt}}</button>
+
+		</div>
+
+	</form>
 
 </div>
