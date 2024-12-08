@@ -22,7 +22,7 @@ import { AppComponent } from "./app.component";
 		provideAnimationsAsync(),
 		provideHttpClient(
 			withInterceptorsFromDi()
-		),
+		)
 	],
 	bootstrap: [AppComponent]
 })
