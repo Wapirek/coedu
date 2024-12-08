@@ -25,15 +25,11 @@
 			</div>
 		}
 
-		<div class="auth__btn-field">
-
-			<button
-					class="auth__btn-field__submit"
-					type="submit"
-					[disabled]="fieldsForm.invalid"
-			>{{btnTxt}}</button>
-
-		</div>
+		<button
+			class="auth__submit"
+			type="submit"
+			[disabled]="fieldsForm.invalid"
+		>{{btnTxt}}</button>
 
 	</form>
 
