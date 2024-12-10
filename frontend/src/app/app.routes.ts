@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
-import { SitesComponent } from "./sites/sites.components";
+import { SpaComponent } from "./spa/spa.component";
 
 export const routes: Routes = [
 	{
 		path: '',
-		component: SitesComponent
+		component: SpaComponent,
+		canActivate: []
 	},
 	{
 		path: 'auth', loadChildren: () =>

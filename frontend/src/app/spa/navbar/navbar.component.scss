@@ -1,0 +1,38 @@
+.nav {
+  background-color: #008d82;
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 20px;
+    color: white;
+
+    i.material-icons-outlined {
+      font-size: 35px;
+    }
+
+    &__txt {
+      padding-top: 4px;
+    }
+  }
+
+  &__logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    position: relative;
+    background-color: rgba(214, 229, 235, 0.4);
+    border: 0;
+    cursor: pointer;
+    border-radius: 5px;
+
+    &:hover { opacity: 0.7; }
+  }
+}

@@ -1,0 +1,124 @@
+.wrapper {
+  max-width: 1000px;
+  margin: 50px auto;
+  display: flex;
+
+  &__left {
+    width: 300px;
+
+    &__title {
+      text-align: center;
+      font-size: 1.3rem;
+      padding: 10px;
+      margin: 0;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 10px 10px 0 0;
+      border-bottom: 1px solid gray;
+      font-weight: lighter;
+    }
+
+    &__list {
+      background-color: rgba(255, 255, 255, 0.3);
+      height: clamp(200px, 40vh, 350px);
+      overflow-y: scroll;
+      border-radius: 0 0 10px 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      &__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 10px;
+        background-color: rgba(42, 108, 111, 0.3);
+        border-radius: 5px;
+        color: rgba(42, 108, 111, 1);
+
+        &__btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: 0;
+          border-radius: 5px;
+          background-color: rgba(255, 255, 255, 0.3);
+          color: #004259;
+          cursor: pointer;
+
+          &:hover { opacity: 0.7; }
+        }
+      }
+
+      &__empty {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 10px;
+      }
+    }
+  }
+
+  &__center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+
+    &__up-field {
+      display: flex;
+      background-color: rgba(255, 255, 255, 0.3);
+      margin: auto;
+      padding: 2rem;
+      text-align: center;
+      border: dashed 1px rgba(42, 108, 111, 1);;
+      height: clamp(200px, 40vh, 250px);
+      width: 80%;
+      position: relative;
+      border-radius: 10px;
+
+      &:hover {
+        opacity: 0.7;
+        filter: blur(.9px);
+      }
+
+      &__input {
+        opacity: 0;
+        position: absolute;
+        z-index: 2;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+      }
+
+      &__label {
+        opacity: 0;
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: pointer;
+      }
+
+      &__icon {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: auto;
+        color: rgba(42, 108, 111, 1);
+
+        i.material-icons-outlined {
+          font-size: 40px;
+          color: rgba(42, 108, 111, 1);
+        }
+      }
+    }
+  }
+}

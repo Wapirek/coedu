@@ -1,0 +1,50 @@
+<div class="wrapper">
+
+	<div class="wrapper__left">
+
+		<h5 class="wrapper__left__title">Pliki użytkownika</h5>
+
+		<div class="wrapper__left__list">
+
+			@for (file of list; track file) {
+				<div class="wrapper__left__list__item">
+					<div class="wrapper__left__list__item__caption">{{file}}</div>
+					<button class="wrapper__left__list__item__btn">
+						<i class="material-icons-outlined">delete</i>
+					</button>
+				</div>
+			} @empty {
+				<div class="wrapper__left__list__empty">
+					<i class="material-icons-outlined">sync_disabled</i>
+					Brak plików
+				</div>
+			}
+
+		</div>
+
+	</div>
+
+	<div class="wrapper__center">
+
+		<div class="wrapper__center__up-field">
+
+			<input
+				type="file"
+				id="fileDropRef"
+				class="wrapper__center__up-field__input"
+				multiple
+				(change)="uploadFiles($event)"
+			>
+
+			<div class="wrapper__center__up-field__icon">
+				<i class="material-icons-outlined">upload_file</i>
+				Kliknij aby dodac plik
+			</div>
+
+			<label for="fileDropRef" class="wrapper__center__up-field__label"></label>
+
+		</div>
+
+	</div>
+
+</div>
