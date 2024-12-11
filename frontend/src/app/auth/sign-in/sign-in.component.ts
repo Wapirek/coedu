@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { FormField } from "../auth-form/_models/form-field.model";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import {AuthService} from "../auth.service";
-import {catchError, first} from "rxjs";
-import {HttpErrorResponse} from "@angular/common/http";
+import { first } from "rxjs";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
