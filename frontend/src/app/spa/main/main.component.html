@@ -6,9 +6,12 @@
 
 		<div class="wrapper__left__list">
 
-			@for (file of list; track file) {
-				<div class="wrapper__left__list__item">
-					<div class="wrapper__left__list__item__caption">{{file}}</div>
+			@for (file of (files$.asObservable() | async); track file) {
+				<div
+					class="wrapper__left__list__item"
+					[ngClass]="{'wrapper__left__list__item--loading': !file.saved }"
+				>
+					<div class="wrapper__left__list__item__caption">{{file.codeName}}</div>
 					<button class="wrapper__left__list__item__btn">
 						<i class="material-icons-outlined">delete</i>
 					</button>
@@ -32,7 +35,6 @@
 				type="file"
 				id="fileDropRef"
 				class="wrapper__center__up-field__input"
-				multiple
 				(change)="uploadFiles($event)"
 			>
 
