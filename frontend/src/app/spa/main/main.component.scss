@@ -37,6 +37,12 @@
         border-radius: 5px;
         color: rgba(42, 108, 111, 1);
 
+        &__caption {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
         &--loading { opacity: .3; }
 
         &__side {
