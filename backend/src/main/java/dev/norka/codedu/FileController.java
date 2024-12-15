@@ -1,101 +1,119 @@
 package dev.norka.codedu;
 
+import io.minio.*;
+import io.minio.errors.*;
+import io.minio.http.Method;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.Set;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @RestController
 @CrossOrigin
 public class FileController {
 
-    //TODO: zmianić to na application properties!
-    private final String uploadDir = "files/";
+    private final MinioClient minioClient;
 
-    public FileController() {
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
+    @Value("${minio.bucket-name}")
+    private String bucketName;
+
+    public FileController(@Value("${minio.url}") String url,
+                          @Value("${minio.access-key}") String accessKey,
+                          @Value("${minio.secret-key}") String secretKey,
+                          @Value("${minio.bucket-name}") String bucketName) {
+        this.minioClient = MinioClient.builder()
+                .endpoint(url)
+                .credentials(accessKey, secretKey)
+                .build();
+
+        // Ensure bucket exists or create it
+        try {
+            boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+            if (!found) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error initializing MinIO bucket: " + e.getMessage());
         }
     }
 
-    //TODO: trzeba dodać sprawdzić czy dana nazwa istnieje a jak istnieje to error wrzucic
-    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(path = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        String fileName = file.getOriginalFilename();
         try {
-            String fileName = file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir + fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            // Upload file to MinIO
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .contentType(file.getContentType())
+                    .build());
             return ResponseEntity.ok("File uploaded successfully: " + fileName);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed: " + e.getMessage());
         }
     }
 
     @GetMapping("/download/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
         try {
-            Path filePath = Paths.get(uploadDir + fileName);
-            Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            // Get a presigned URL for the object
+            String presignedUrl = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .method(Method.GET)
+                    .expiry(2, TimeUnit.HOURS) // URL valid for 2 hours
+                    .build());
+
+            Resource resource = new UrlResource(presignedUrl);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
-    @DeleteMapping ("/download/{fileName}")
+    @DeleteMapping("/download/{fileName}")
     public ResponseEntity<String> deleteFile(@PathVariable String fileName) {
         try {
-            Path filePath = Paths.get(uploadDir + fileName);
-            if(Files.deleteIfExists(filePath)){
-                return ResponseEntity.ok("successful");
-            }
-            else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(fileName)
+                    .build());
+            return ResponseEntity.ok("File deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File deletion failed: " + e.getMessage());
         }
     }
 
-
     @GetMapping("/files")
-    public ResponseEntity<Set<String>> getFiles(){
+    public ResponseEntity<List<String>> getFiles() {
         try {
+            List<String> fileNames = StreamSupport.stream(minioClient.listObjects(ListObjectsArgs.builder()
+                            .bucket(bucketName)
+                            .build()).spliterator(), false)
+                    .map(result -> {
+                        try {
+                            return result.get().objectName();
+                        } catch (Exception e) {
+                            throw new RuntimeException("Error fetching object name: " + e.getMessage());
+                        }
+                    })
+                    .collect(Collectors.toList());
 
-            Set<String> fileList = Stream.of(Objects.requireNonNull(new File(uploadDir).listFiles()))
-                    .filter(file -> !file.isDirectory())
-                    .map(File::getName)
-                    .collect(Collectors.toSet());
-
-            return ResponseEntity.ok(fileList);
-
-        }catch (Exception e){
-            //tak wiem jak to wygląda ale jest git :V
-            return (ResponseEntity<Set<String>>) ResponseEntity.notFound();
+            return ResponseEntity.ok(fileNames);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
     }
 }
