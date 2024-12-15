@@ -7,9 +7,5 @@ export const routes: Routes = [
 		component: SpaComponent,
 		canActivate: []
 	},
-	{
-		path: 'auth', loadChildren: () =>
-			import('./auth/auth.module').then((m) => m.AuthModule)
-	},
 	{ path: '**', redirectTo: '' },
 ];

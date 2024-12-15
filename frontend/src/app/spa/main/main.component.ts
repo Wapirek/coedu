@@ -20,9 +20,7 @@ export class MainComponent implements OnInit {
 
   uploadFiles = (file: any) => {
     const fileConvert: File = (file.target?.files as FileList)[0];
-
     this.updateFileList(fileConvert.name);
-
     this.spaService.uploadFiles(fileConvert).pipe(first()).subscribe();
   }
 

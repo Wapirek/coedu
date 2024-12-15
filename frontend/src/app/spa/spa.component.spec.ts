@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SpaComponent } from './spa.component';
+import { AppModule } from "../app.module";
 
 describe('SpaComponent', () => {
   let component: SpaComponent;
@@ -8,7 +9,7 @@ describe('SpaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SpaComponent]
+      imports: [AppModule]
     })
     .compileComponents();
 
