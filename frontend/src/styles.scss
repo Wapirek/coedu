@@ -9,3 +9,7 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: #d6e5eb;
 }
+
+*::-webkit-scrollbar {
+  width: 0;
+}
