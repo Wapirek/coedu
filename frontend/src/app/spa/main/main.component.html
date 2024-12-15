@@ -12,9 +12,17 @@
 					[ngClass]="{'wrapper__left__list__item--loading': !file.saved }"
 				>
 					<div class="wrapper__left__list__item__caption">{{file.codeName}}</div>
-					<button class="wrapper__left__list__item__btn">
-						<i class="material-icons-outlined">delete</i>
-					</button>
+                    <div class="wrapper__left__list__item__side">
+                        <a
+                            class="wrapper__left__list__item__side__btn"
+                            [href]="file.link"
+                        >
+                            <i class="material-icons-outlined">download</i>
+                        </a>
+                        <button class="wrapper__left__list__item__side__btn">
+                            <i class="material-icons-outlined">delete</i>
+                        </button>
+                    </div>
 				</div>
 			} @empty {
 				<div class="wrapper__left__list__empty">

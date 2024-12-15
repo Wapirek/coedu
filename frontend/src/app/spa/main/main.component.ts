@@ -16,19 +16,32 @@ export class MainComponent implements OnInit {
 
   constructor(private spaService: SpaService) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { this.getFiles(); }
 
   uploadFiles = (file: any) => {
     const fileConvert: File = (file.target?.files as FileList)[0];
 
     this.updateFileList(fileConvert.name);
 
-    this.spaService.uploadFiles(fileConvert).pipe(
-      first()
-    ).subscribe(
+    this.spaService.uploadFiles(fileConvert).pipe(first()).subscribe(
       () => this.updateFileList(fileConvert.name),
       () => this.removeFromFileList(fileConvert.name)
+    );
+  }
+
+  getFiles(): void {
+    this.spaService.getUploadedFiles().subscribe(
+        (res: string[]) => {
+          this.files = res.map((r: string) => {
+            return {
+              codeName: r,
+              saved: true,
+              link: this.spaService.apiUrl + '/download/' + r
+            } as FileModel;
+          });
+
+          this.files$.next(this.files);
+        }
     );
   }
 
@@ -48,8 +61,12 @@ export class MainComponent implements OnInit {
   }
 
   private removeFromFileList(fileName: string): void {
-    const index: number = this.files.findIndex(f => f.codeName === fileName);
-    this.files.splice(index, 1);
-    this.files$.next(this.files);
+    this.spaService.removeUploadedFile(fileName).pipe(first()).subscribe(
+        () => {
+          const index: number = this.files.findIndex(f => f.codeName === fileName);
+          this.files.splice(index, 1);
+          this.files$.next(this.files);
+        }
+    )
   }
 }

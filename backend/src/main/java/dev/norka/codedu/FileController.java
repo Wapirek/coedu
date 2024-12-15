@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
+@CrossOrigin
 public class FileController {
-
 
     //TODO: zmianić to na application properties!
     private final String uploadDir = "files/";
@@ -34,7 +34,6 @@ public class FileController {
             directory.mkdirs();
         }
     }
-
 
     //TODO: trzeba dodać sprawdzić czy dana nazwa istnieje a jak istnieje to error wrzucic
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
